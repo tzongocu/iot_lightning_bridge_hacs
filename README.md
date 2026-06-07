@@ -4,64 +4,64 @@
 [![GitHub Release](https://img.shields.io/github/release/tzongocu/iot_lightning_bridge_hacs?style=for-the-badge)](https://github.com/tzongocu/iot_lightning_bridge_hacs/releases)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=for-the-badge)](https://opensource.org/licenses/MIT)
 
-**Bridge oficial pentru integrarea dispozitivelor IOT Lightning în Home Assistant via MQTT.**
+**Official bridge for integrating IOT Lightning devices into Home Assistant via MQTT.**
 
-## 🎯 Funcționalități
+## 🎯 Features
 
-- 🔌 **MQTT Discovery** - Detectare automată în Home Assistant
-- 🔐 **Autentificare Token** - Protecție prin API token
-- ⚡ **Lightning Network** - Integrare completă cu rețele Lightning
-- 📊 **Control Real-time** - Comande instantanee prin MQTT
-- 🎨 **Config Flow UI** - Interfață de configurare grafică
-- 🏥 **Availability Status** - Raportare automată a statusului online/offline
-- 📝 **Logging Complet** - Debug messages detailate
+- 🔌 **MQTT Discovery** - Automatic discovery in Home Assistant
+- 🔐 **Token Authentication** - API token protection
+- ⚡ **Lightning Network** - Full integration with Lightning networks
+- 📊 **Real-time Control** - Instant commands via MQTT
+- 🎨 **Config Flow UI** - Graphical configuration interface
+- 🟢 **Availability Status** - Automatic online/offline reporting
+- 📝 **Comprehensive Logging** - Detailed debug messages
 
-## 📥 Instalare
+## 📥 Installation
 
-### Metoda 1: Instalare prin HACS (Recomandat)
+### Method 1: Install via HACS (Recommended)
 
-1. Deschide **HACS** → **Integrations**
-2. Click pe **⋮** (colț dreapta sus) → **Custom repositories**
-3. Adaugă URL-ul: `https://github.com/yourusername/iot_lightning_bridge_hacs`
-4. Selectează categoria: **Integration**
+1. Open **HACS** → **Integrations**
+2. Click **⋮** (top-right) → **Custom repositories**
+3. Add the URL: `https://github.com/yourusername/iot_lightning_bridge_hacs`
+4. Select category: **Integration**
 5. Click **Install**
 6. **Restart Home Assistant**
-7. Mergi la **Settings** → **Devices & Services** → **Add Integration**
-8. Caută "IOT Lightning Bridge HACS"
+7. Go to **Settings** → **Devices & Services** → **Add Integration**
+8. Search for "IOT Lightning Bridge HACS"
 
-### Metoda 2: Instalare Manuală (Development)
+### Method 2: Manual Install (Development)
 
 ```bash
-# Clone repository-ul
+# Clone the repository
 git clone https://github.com/tzongocu/iot_lightning_bridge_hacs.git
 
-# Copiază în Home Assistant
+# Copy into Home Assistant custom components
 cp -r iot_lightning_bridge_hacs /config/custom_components/
 
 # Restart Home Assistant
 # Settings → System → Restart
 ```
 
-### Metoda 3: Docker/HA OS
+### Method 3: Docker / HA OS
 
-Dacă folosești **Docker** sau **Home Assistant OS**:
-1. Deschide **File Editor** addon (din Add-on Store)
-2. Navigează la `/config/custom_components/`
-3. Creează folder: `iot_lightning_bridge_hacs`
-4. Upload fișierele din repository
+If you use **Docker** or **Home Assistant OS**:
+1. Open the **File Editor** add-on (from Add-on Store)
+2. Navigate to `/config/custom_components/`
+3. Create folder: `iot_lightning_bridge_hacs`
+4. Upload the repository files
 
-## ⚙️ Configurare
+## ⚙️ Configuration
 
-### Prin UI (Recomandat)
+### Via UI (Recommended)
 
-După instalare:
+After installation:
 1. **Settings** → **Devices & Services**
-2. Click **Create Integration** (sau caută "IOT Lightning Bridge")
-3. Completează formularul:
-   - **API Token**: Token-ul tău de autentificare
-   - **MQTT Broker Prefix**: Prefixul pentru topicuri (ex: `iot/lightning`)
+2. Click **Create Integration** (or search for "IOT Lightning Bridge")
+3. Fill the form:
+   - **API Token**: Your authentication token
+   - **MQTT Broker Prefix**: Topic prefix (e.g. `iot/lightning`)
 
-### Prin YAML (Opțional)
+### Via YAML (Optional)
 
 ```yaml
 # configuration.yaml
@@ -119,62 +119,62 @@ Payload: online / offline
 QoS: 1, Retain: True
 ```
 
-## 🔍 Depanare
+## 🔍 Troubleshooting
 
-### Integrarea nu apare în UI?
+### Integration does not appear in the UI?
 
 ```
-1. Verifică loguri: Settings → System → Logs
-2. Cauta: "iot_lightning_bridge_hacs"
-3. Verifica dacă MQTT integration este încărcată
+1. Check logs: Settings → System → Logs
+2. Search for: "iot_lightning_bridge_hacs"
+3. Verify the MQTT integration is loaded
 ```
 
-Erori comune:
-- ❌ `MQTT integration not loaded` → Configureaza MQTT în HA mai întâi
-- ❌ `invalid_api_token` → Token prea scurt (min. 3 caractere)
-- ❌ `invalid_broker_prefix` → Prefixul nu poate fi gol
+Common errors:
+- ❌ `MQTT integration not loaded` → Configure MQTT in HA first
+- ❌ `invalid_api_token` → Token too short (min. 3 characters)
+- ❌ `invalid_broker_prefix` → Prefix cannot be empty
 
-### MQTT nu funcționează?
+### MQTT not working?
 
 ```bash
-# Verifică conexiunea MQTT
+# Check MQTT connection
 mosquitto_sub -h <mqtt_broker> -t "homeassistant/switch/iot_lightning_bridge_hacs/#"
 
-# Poți vedea payload-ul discovery
+# You can view the discovery payload
 mosquitto_sub -h <mqtt_broker> -t "iot/lightning/#"
 ```
 
-### Verifică Log-urile Home Assistant
+### Check Home Assistant Logs
 
 ```
 Settings → System → Logs
-Filtrează: iot_lightning_bridge_hacs
+Filter: iot_lightning_bridge_hacs
 ```
 
-Caut pe liniile cu:
-- `✓` `Published MQTT Discovery`
-- `✓` `Published availability 'online'`
-- `⚠️` `MQTT component not available`
-- `❌` `Error publishing`
+Look for lines such as:
+- `✓ Published MQTT Discovery`
+- `✓ Published availability 'online'`
+- `⚠️ MQTT component not available`
+- `❌ Error publishing`
 
-## 📋 Cerințe
+## 📋 Requirements
 
 - **Home Assistant:** 2026.1.0+
-- **MQTT Integration:** Configurată și funcțională
+- **MQTT Integration:** Configured and working
 - **Python:** 3.11+
-- **Librării:** Doar componente native Home Assistant (zero dependențe externe)
+- **Libraries:** Only native Home Assistant components (no external dependencies)
 
-## 📁 Structura Proiect
+## 📁 Project Structure
 
 ```
 iot_lightning_bridge_hacs/
-├── __init__.py              # Setup și lifecycle
-├── config_flow.py           # Formular configurare
-├── const.py                 # Constante domeniu
-├── switch.py                # Entitate switch cu MQTT
-├── manifest.json            # Metadata integrare
-├── strings.json             # Traduceri UI
-├── README.md                # Documentație
+├── __init__.py              # Setup and lifecycle
+├── config_flow.py           # Configuration form
+├── const.py                 # Domain constants
+├── switch.py                # Switch entity with MQTT
+├── manifest.json            # Integration metadata
+├── strings.json             # UI translations
+├── README.md                # Documentation
 └── LICENSE                  # MIT License
 ```
 
@@ -194,19 +194,19 @@ python -m py_compile *.py
 pytest tests/
 ```
 
-### Workflow pentru Contribuții
+### Contribution Workflow
 
-1. Fork repository-ul
-2. Creează branch: `git checkout -b feature/my-feature`
+1. Fork the repository
+2. Create branch: `git checkout -b feature/my-feature`
 3. Commit: `git commit -am 'Add my feature'`
 4. Push: `git push origin feature/my-feature`
-5. Deschide Pull Request
+5. Open a Pull Request
 
-## 📝 Jurnal Schimbări
+## 📝 Changelog
 
 ### v1.0.0 (2026-06-07)
-- 🎉 Prima versiune publică
-- ✅ MQTT Discovery complet
+- 🎉 First public release
+- ✅ MQTT Discovery complete
 - ✅ Config Flow UI
 - ✅ Availability status tracking
 - ✅ Full async/await pattern
@@ -214,15 +214,15 @@ pytest tests/
 ## 🆘 Support & Issues
 
 - **Bugs:** [GitHub Issues](https://github.com/tzongocu/iot_lightning_bridge_hacs/issues)
-- **Discuții:** [GitHub Discussions](https://github.com/tzongocu/iot_lightning_bridge_hacs/discussions)
-- **Home Assistant Forum:** Menționează `@tzongocu`
+- **Discussions:** [GitHub Discussions](https://github.com/tzongocu/iot_lightning_bridge_hacs/discussions)
+- **Home Assistant Forum:** Mention `@tzongocu`
 
-## 📄 Licență
+## 📄 License
 
-[MIT License](LICENSE) - Liber de folosit în proiecte comerciale și personale
+[MIT License](LICENSE) - Free to use in commercial and personal projects
 
 ---
 
-**Made with ❤️ for Home Assistant**
+Made with ❤️ for Home Assistant
 
-Dacă a fost util, dă un ⭐ pe GitHub!
+If this project was helpful, please give it a ⭐ on GitHub!
