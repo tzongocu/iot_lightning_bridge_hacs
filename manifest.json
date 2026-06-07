@@ -1,0 +1,13 @@
+{
+  "domain": "iot_lightning_bridge_hacs",
+  "name": "IOT Lightning Bridge HACS",
+  "codeowners": ["@tzongocu"],
+  "config_flow": true,
+  "documentation": "https://github.com/tzongocu/iot_lightning_bridge_hacs",
+  "issue_tracker": "https://github.com/tzongocu/iot_lightning_bridge_hacs/issues",
+  "requirements": [],
+  "version": "1.0.0",
+  "homeassistant": "2026.1.0",
+  "dependencies": ["mqtt"],
+  "after_dependencies": ["mqtt"]
+}

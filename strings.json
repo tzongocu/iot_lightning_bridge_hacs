@@ -1,0 +1,44 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "IOT Lightning Bridge HACS Setup",
+        "description": "Configure your IOT Lightning Bridge credentials. MQTT integration must be enabled in Home Assistant.",
+        "data": {
+          "api_token": "API Token",
+          "broker_prefix": "MQTT Broker Prefix"
+        },
+        "data_description": {
+          "api_token": "Your authentication token (minimum 3 characters)",
+          "broker_prefix": "MQTT topic prefix (e.g., iot/lightning). Device will use this for state and command topics."
+        }
+      }
+    },
+    "error": {
+      "invalid_api_token": "Invalid API token. Token must be at least 3 characters long.",
+      "invalid_broker_prefix": "Broker prefix cannot be empty. Use format like: iot/lightning"
+    },
+    "abort": {
+      "already_configured": "This integration is already configured. You can only add one IOT Lightning Bridge per Home Assistant instance."
+    }
+  },
+  "entity": {
+    "switch": {
+      "bridge": {
+        "name": "Lightning Bridge"
+      }
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "IOT Lightning Bridge Options",
+        "description": "Update your IOT Lightning Bridge configuration. Changes will take effect immediately.",
+        "data": {
+          "api_token": "API Token",
+          "broker_prefix": "MQTT Broker Prefix"
+        }
+      }
+    }
+  }
+}

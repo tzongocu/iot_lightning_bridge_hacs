@@ -1,0 +1,112 @@
+"""Config flow for IOT Lightning Bridge HACS."""
+import logging
+from typing import Any, Dict, Optional
+
+import voluptuous as vol
+from homeassistant import config_entries
+from homeassistant.core import HomeAssistant
+from homeassistant.data_entry_flow import FlowResult
+
+from .const import CONF_API_TOKEN, CONF_BROKER_PREFIX, DEFAULT_BROKER_PREFIX, DOMAIN
+
+_LOGGER = logging.getLogger(__name__)
+
+
+async def validate_api_token(hass: HomeAssistant, api_token: str) -> bool:
+    """Validate the API token asynchronously."""
+    try:
+        # Basic validation
+        if not api_token or len(api_token) < 3:
+            _LOGGER.warning("API token validation failed: token too short")
+            return False
+
+        # Token format: should not contain spaces, should be alphanumeric or similar
+        if api_token != api_token.strip():
+            _LOGGER.warning("API token validation failed: contains leading/trailing whitespace")
+            return False
+
+        # You can add actual API validation here:
+        # Example:
+        # session = async_get_clientsession(hass)
+        # try:
+        #     async with session.get(
+        #         f"https://api.example.com/validate",
+        #         headers={"Authorization": f"Bearer {api_token}"},
+        #         timeout=10
+        #     ) as resp:
+        #         if resp.status != 200:
+        #             _LOGGER.error("API validation failed with status %d", resp.status)
+        #             return False
+        # except asyncio.TimeoutError:
+        #     _LOGGER.error("API validation timeout - broker may be unreachable")
+        #     return False
+
+        _LOGGER.debug("API token validation passed (basic check)")
+        return True
+    except Exception as err:
+        _LOGGER.error("Error validating API token: %s", err)
+        return False
+
+
+class IOTLightningBridgeConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
+    """Handle a config flow for IOT Lightning Bridge HACS."""
+
+    VERSION = 1
+
+    async def async_step_user(
+        self, user_input: Optional[Dict[str, Any]] = None
+    ) -> FlowResult:
+        """Handle the initial step."""
+        errors: Dict[str, str] = {}
+
+        if user_input is not None:
+            # Validate API token
+            api_token = user_input.get(CONF_API_TOKEN, "").strip()
+            if not await validate_api_token(self.hass, api_token):
+                errors[CONF_API_TOKEN] = "invalid_api_token"
+
+            # Validate broker prefix
+            broker_prefix = user_input.get(CONF_BROKER_PREFIX, "").strip()
+            if not broker_prefix:
+                errors[CONF_BROKER_PREFIX] = "invalid_broker_prefix"
+
+            if not errors:
+                # Check if entry already exists
+                await self.async_set_unique_id(f"{DOMAIN}_{api_token}")
+                self._abort_if_unique_id_configured()
+
+                return self.async_create_entry(
+                    title="IOT Lightning Bridge",
+                    data={
+                        CONF_API_TOKEN: api_token,
+                        CONF_BROKER_PREFIX: broker_prefix,
+                    },
+                )
+
+        # Create the form schema
+        schema = vol.Schema(
+            {
+                vol.Required(
+                    CONF_API_TOKEN,
+                    description={"suggested_value": ""},
+                ): str,
+                vol.Required(
+                    CONF_BROKER_PREFIX,
+                    description={"suggested_value": DEFAULT_BROKER_PREFIX},
+                ): str,
+            }
+        )
+
+        return self.async_show_form(
+            step_id="user",
+            data_schema=schema,
+            errors=errors,
+            description_placeholders={
+                "info": "Enter your IOT Lightning Bridge credentials"
+            },
+        )
+
+    async def async_step_import(self, import_data: Dict[str, Any]) -> FlowResult:
+        """Handle import from configuration.yaml."""
+        _LOGGER.debug("Importing IOT Lightning Bridge HACS from YAML config")
+        return await self.async_step_user(import_data)

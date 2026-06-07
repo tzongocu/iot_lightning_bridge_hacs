@@ -1,0 +1,80 @@
+# 🚀 QUICK GIT COMMANDS - COPY & PASTE
+
+## SETUP (Execute once)
+
+```bash
+cd /home/tzongocu/Productie/iot_lightning_bridge_hacs
+git init
+git config --global user.name "Your Name Here"
+git config --global user.email "your.email@example.com"
+```
+
+## ADD REMOTE (Execute once - REPLACE YOUR_USERNAME)
+
+```bash
+git remote add origin https://github.com/YOUR_USERNAME/iot_lightning_bridge_hacs.git
+```
+
+## PUSH TO GITHUB (Execute now)
+
+```bash
+git add .
+git commit -m "Initial commit: IOT Lightning Bridge HACS integration"
+git branch -M main
+git push -u origin main
+```
+
+---
+
+## VERIFY AFTER PUSH
+
+```bash
+# Check remote
+git remote -v
+
+# Check local status
+git status
+
+# View commits
+git log --oneline
+```
+
+---
+
+## FUTURE UPDATES (After making changes)
+
+```bash
+git add .
+git commit -m "Your message here"
+git push
+```
+
+---
+
+## IMPORTANT NOTES
+
+⚠️ Replace `YOUR_USERNAME` with your actual GitHub username!
+
+Example:
+```bash
+# If your GitHub username is "john_doe"
+git remote add origin https://github.com/john_doe/iot_lightning_bridge_hacs.git
+```
+
+✅ After `git push`, check: https://github.com/YOUR_USERNAME/iot_lightning_bridge_hacs
+
+---
+
+## HACS CUSTOM REPOSITORY URL
+
+After everything is on GitHub, use this URL to add to HACS:
+
+```
+https://github.com/YOUR_USERNAME/iot_lightning_bridge_hacs
+```
+
+HACS → ⋮ → Custom repositories → Paste URL → Category: Integration
+
+---
+
+Happy deploying! 🎉
