@@ -7,16 +7,9 @@
         "data": {
           "api_token": "API Token",
           "broker_prefix": "MQTT Broker Prefix",
-          "topic": "Entity MQTT Topic",
-          "name": "Friendly Name",
-          "token": "Entity Token"
-        },
-        "data_description": {
-          "api_token": "Your authentication token (minimum 3 characters)",
-          "broker_prefix": "MQTT topic prefix (e.g., iot/lightning). Device will use this for state and command topics.",
-          "topic": "Optional manual entity topic for this bridge",
-          "name": "Optional friendly name for the entity",
-          "token": "Optional token for this entity"
+          "topic": "Entity MQTT Topic (Optional)",
+          "name": "Friendly Name (Optional)",
+          "token": "Entity Token (Optional)"
         }
       },
       "add_entity": {
@@ -34,21 +27,14 @@
       "invalid_broker_prefix": "Broker prefix cannot be empty. Use format like: iot/lightning"
     },
     "abort": {
-      "already_configured": "This integration is already configured. You can only add one IOT Lightning Bridge per Home Assistant instance."
-    }
-  },
-  "entity": {
-    "switch": {
-      "bridge": {
-        "name": "Lightning Bridge"
-      }
+      "already_configured": "This integration is already configured."
     }
   },
   "options": {
     "step": {
       "init": {
         "title": "IOT Lightning Bridge Options",
-        "description": "Update your IOT Lightning Bridge configuration. Changes will take effect immediately.",
+        "description": "Update your IOT Lightning Bridge configuration.",
         "data": {
           "api_token": "API Token",
           "broker_prefix": "MQTT Broker Prefix"
