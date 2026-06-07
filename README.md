@@ -2,11 +2,7 @@
   <img src="./img/bg.jpg" alt="IOT Lightning Bridge Banner" width="100%" />
 </p>
 
-<p align="center">
-  <img src="./img/logo.png" alt="IOT Lightning Bridge Logo" width="200" />
-</p>
-
-# IOT Lightning Bridge HACS
+# <img src="./img/logo.png" alt="IOT Lightning Bridge Logo" width="32" style="vertical-align: middle; margin-right: 8px;" /> IOT Lightning Bridge HACS
 
 [![hacs_badge](https://img.shields.io/badge/HACS-Custom-41BDF5.svg?style=for-the-badge)](https://github.com/hacs/integration)
 [![GitHub Release](https://img.shields.io/github/release/tzongocu/iot_lightning_bridge_hacs?style=for-the-badge)](https://github.com/tzongocu/iot_lightning_bridge_hacs/releases)
