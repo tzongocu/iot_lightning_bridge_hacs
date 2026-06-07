@@ -1,107 +1,69 @@
 """IOT Lightning Bridge HACS integration."""
 import logging
-
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.typing import ConfigType
-
 from .const import DOMAIN
 
-SERVICE_ADD_ENTITY = "add_entity"
-
 _LOGGER = logging.getLogger(__name__)
-
 PLATFORMS = ["switch"]
 
+class IOTLightningManager:
+    """Manager pentru a gestiona entitățile dinamice."""
+    def __init__(self, hass, entry):
+        self.hass = hass
+        self.entry = entry
+
+    async def add_manual_entity(self, topic, name, token):
+        """Logica pentru a notifica switch.py să creeze o nouă entitate."""
+        # Aici vom declanșa crearea entității în switch.py
+        # Folosim un semnal sau actualizăm starea internă
+        _LOGGER.info("Adăugare entitate dinamică: %s pe topicul %s", name, topic)
+        # Notă: Implementarea propriu-zisă va fi în switch.py folosind discovery
 
 async def async_setup(hass: HomeAssistant, config: ConfigType) -> bool:
     """Set up the IOT Lightning Bridge HACS component."""
-    _LOGGER.debug("Setting up IOT Lightning Bridge HACS")
-    hass.data[DOMAIN] = {}
+    hass.data.setdefault(DOMAIN, {})
     return True
 
-
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
-    """Set up IOT Lightning Bridge HACS from a config entry."""
-    _LOGGER.debug("Setting up IOT Lightning Bridge HACS entry: %s", entry.entry_id)
-
-    # Verify MQTT is loaded
+    """Set up entry and initialize the Manager."""
+    
     if "mqtt" not in hass.data:
-        _LOGGER.error(
-            "MQTT integration not loaded. Please ensure MQTT integration is configured in Home Assistant."
-        )
+        _LOGGER.error("MQTT integration not loaded.")
         return False
 
-    # Store the config data
+    # Inițializăm Managerul
+    manager = IOTLightningManager(hass, entry)
+    
     hass.data[DOMAIN][entry.entry_id] = {
         "api_token": entry.data.get("api_token"),
         "broker_prefix": entry.data.get("broker_prefix"),
+        "manager": manager,
     }
 
-    _LOGGER.info(
-        "IOT Lightning Bridge HACS initialized with broker prefix: %s",
-        entry.data.get("broker_prefix"),
-    )
-
-    # Forward the setup to platforms
     await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
-
-    # Listen for changes
-    entry.async_on_unload(entry.add_update_listener(async_update_listener))
-
+    
+    # Înregistrare serviciu
     async def async_add_entity_service(call):
-        """Service handler to add a manual entity.
-
-        Payload: {"topic": "prefix/device", "name": "Friendly name", "token": "optional", "entry_id": optional}
-        """
-        data = call.data or {}
-        topic = data.get("topic")
-        name = data.get("name")
-        token = data.get("token")
-        target_entry_id = data.get("entry_id")
-
-        # Find the target entry
-        entries = hass.config_entries.async_entries(DOMAIN)
-        if target_entry_id:
-            entry_obj = next((e for e in entries if e.entry_id == target_entry_id), None)
-        else:
-            entry_obj = entries[0] if entries else None
-
-        if not entry_obj:
-            _LOGGER.error("No config entry found to add entity to")
-            return
-
-        # Persist in options
-        options = dict(entry_obj.options) if entry_obj.options else {}
+        topic = call.data.get("topic")
+        name = call.data.get("name")
+        token = call.data.get("token")
+        
+        # Persistență în options
+        options = dict(entry.options)
         manual = list(options.get("manual_entities", []))
-        token = data.get("token")
         manual.append({"topic": topic, "name": name, "token": token})
         options["manual_entities"] = manual
-        hass.config_entries.async_update_entry(entry_obj, options=options)
+        
+        hass.config_entries.async_update_entry(entry, options=options)
+        await manager.add_manual_entity(topic, name, token)
 
-        # Create entity immediately if manager exists
-        manager = hass.data[DOMAIN].get(entry_obj.entry_id, {}).get("manager")
-        if manager:
-            await manager.add_manual_entity(topic, name, token)
-
-    hass.services.async_register(DOMAIN, SERVICE_ADD_ENTITY, async_add_entity_service)
+    hass.services.async_register(DOMAIN, "add_entity", async_add_entity_service)
     return True
-
 
 async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     """Unload a config entry."""
-    _LOGGER.debug("Unloading IOT Lightning Bridge HACS entry: %s", entry.entry_id)
-
-    # Unload platforms
     if unload_ok := await hass.config_entries.async_unload_platforms(entry, PLATFORMS):
         hass.data[DOMAIN].pop(entry.entry_id)
-
     return unload_ok
-
-
-async def async_update_listener(
-    hass: HomeAssistant, config_entry: ConfigEntry
-) -> None:
-    """Handle options update."""
-    _LOGGER.debug("Reloading IOT Lightning Bridge HACS entry due to options change")
-    await hass.config_entries.async_reload(config_entry.entry_id)
