@@ -12,6 +12,15 @@
           "api_token": "Your authentication token (minimum 3 characters)",
           "broker_prefix": "MQTT topic prefix (e.g., iot/lightning). Device will use this for state and command topics."
         }
+      },
+      "add_entity": {
+        "title": "Add Manual Entity",
+        "description": "Optionally add a manual entity now with topic, friendly name, and token.",
+        "data": {
+          "topic": "Entity MQTT Topic",
+          "name": "Friendly Name",
+          "token": "Entity Token"
+        }
       }
     },
     "error": {
@@ -37,6 +46,15 @@
         "data": {
           "api_token": "API Token",
           "broker_prefix": "MQTT Broker Prefix"
+        }
+      },
+      "add_form": {
+        "title": "Add Manual Entity",
+        "description": "Add a manual entity with topic, friendly name, and token.",
+        "data": {
+          "topic": "Entity MQTT Topic",
+          "name": "Friendly Name",
+          "token": "Entity Token"
         }
       }
     }

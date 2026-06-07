@@ -1,5 +1,6 @@
 {
   "name": "IOT Lightning Bridge HACS",
+  "logo": "img/logo.jpg",
   "content_in_root": false,
   "homeassistant": "2026.1.0",
   "hacs": "1.0.0",

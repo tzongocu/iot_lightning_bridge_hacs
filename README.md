@@ -65,6 +65,13 @@ After installation:
    - **API Token**: Your authentication token
    - **MQTT Broker Prefix**: Topic prefix (e.g. `iot/lightning`)
 
+The setup flow now also offers an optional second step to add one manual entity immediately with:
+   - **Topic**: MQTT topic for the device
+   - **Name**: Friendly entity name
+   - **Token**: Entity token (optional)
+
+If you skip that, you can always add manual entities later by opening the integration and choosing **Configure** → **Add Entity**.
+
 Discovery behavior:
 - The integration subscribes to `\{broker_prefix\}/#` and will create entities when it sees device messages.
 - To allow automatic, immediate discovery on install, devices should either:
