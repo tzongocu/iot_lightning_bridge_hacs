@@ -1,3 +1,11 @@
+<p align="center">
+  <img src="./img/bg.jpg" alt="IOT Lightning Bridge Banner" width="100%" />
+</p>
+
+<p align="center">
+  <img src="./img/logo.png" alt="IOT Lightning Bridge Logo" width="200" />
+</p>
+
 # IOT Lightning Bridge HACS
 
 [![hacs_badge](https://img.shields.io/badge/HACS-Custom-41BDF5.svg?style=for-the-badge)](https://github.com/hacs/integration)
@@ -5,6 +13,10 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=for-the-badge)](https://opensource.org/licenses/MIT)
 
 **Official bridge for integrating IOT Lightning devices into Home Assistant via MQTT.**
+
+## 📬 Contact
+- Email: [contact@botrift.com](mailto:contact@botrift.com)
+- Creator: [https://botrift.com](https://botrift.com)
 
 ## 🎯 Features
 
@@ -60,6 +72,12 @@ After installation:
 3. Fill the form:
    - **API Token**: Your authentication token
    - **MQTT Broker Prefix**: Topic prefix (e.g. `iot/lightning`)
+
+Discovery behavior:
+- The integration subscribes to `\{broker_prefix\}/#` and will create entities when it sees device messages.
+- To allow automatic, immediate discovery on install, devices should either:
+  - publish retained state messages under their topic (e.g. `iot/lightning/device123` retained), or
+  - respond to an active discovery request: after subscribing, the integration publishes a discovery request to `{broker_prefix}/get` with payload `{"cmd":"whoareyou"}`; devices should reply on their own topic with their id/state.
 
 ### Via YAML (Optional)
 
@@ -142,6 +160,40 @@ mosquitto_sub -h <mqtt_broker> -t "homeassistant/switch/iot_lightning_bridge_hac
 
 # You can view the discovery payload
 mosquitto_sub -h <mqtt_broker> -t "iot/lightning/#"
+
+If you want to trigger discovery manually, publish a discovery request:
+
+```bash
+# Ask devices to announce themselves (they should reply on their own topic)
+mosquitto_pub -h <mqtt_broker> -t "iot/lightning/get" -m '{"cmd":"whoareyou"}'
+```
+
+Manual entity creation via service
+---------------------------------
+
+You can add entities manually via a Home Assistant service call. This is useful to pre-create entities
+so they are available for automations before any device messages arrive.
+
+Service: `iot_lightning_bridge_hacs.add_entity`
+Payload:
+
+```yaml
+topic: "<prefix>/<device_id>"  # e.g. bogdan/dp8ipv3db1t930v
+name: "Friendly Name"          # optional
+entry_id: "<config_entry_id>"  # optional, if multiple entries exist
+```
+
+Example using `ha` CLI (or Developer Tools → Services):
+
+```bash
+# Add an entity and persist it in integration options
+ha services call iot_lightning_bridge_hacs.add_entity '{"topic":"bogdan/dp8ipv3db1t930v","name":"Living Room Lamp"}'
+```
+
+When called, the service will:
+- persist the topic+name in the integration's options (`manual_entities`),
+- create the `switch` entity immediately in Home Assistant, and
+- publish discovery/availability so the entity appears and can be used in automations.
 ```
 
 ### Check Home Assistant Logs

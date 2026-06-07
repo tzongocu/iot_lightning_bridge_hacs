@@ -110,3 +110,69 @@ class IOTLightningBridgeConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         """Handle import from configuration.yaml."""
         _LOGGER.debug("Importing IOT Lightning Bridge HACS from YAML config")
         return await self.async_step_user(import_data)
+
+    @staticmethod
+    def async_get_options_flow(config_entry: config_entries.ConfigEntry):
+        return IOTLightningBridgeOptionsFlow(config_entry)
+
+
+class IOTLightningBridgeOptionsFlow(config_entries.OptionsFlow):
+    """Options flow to add manual entities (topics + friendly names)."""
+
+    def __init__(self, config_entry: config_entries.ConfigEntry) -> None:
+        self.config_entry = config_entry
+
+    async def async_step_init(self, user_input: Optional[Dict[str, Any]] = None) -> FlowResult:
+        """Show initial options form: choose Add or Remove."""
+        if user_input is not None:
+            action = user_input.get("action")
+            if action == "add":
+                return await self.async_step_add_form()
+            if action == "remove":
+                return await self.async_step_remove()
+
+        schema = vol.Schema({vol.Required("action", default="add"): vol.In(["add", "remove"])})
+        return self.async_show_form(step_id="init", data_schema=schema)
+
+    async def async_step_add_form(self, user_input: Optional[Dict[str, Any]] = None) -> FlowResult:
+        """Show form to input topic and optional name for adding an entity."""
+        if user_input is not None:
+            return await self.async_step_add(user_input)
+
+        schema = vol.Schema({vol.Required("topic"): str, vol.Optional("name", default=""): str})
+        return self.async_show_form(step_id="add_form", data_schema=schema)
+
+    async def async_step_remove(self, user_input: Optional[Dict[str, Any]] = None) -> FlowResult:
+        """Show list of manual entities to remove."""
+        manual = list(self.config_entry.options.get("manual_entities", [])) if self.config_entry.options else []
+        topics = [m.get("topic") for m in manual if m.get("topic")]
+
+        if not topics:
+            return self.async_show_form(
+                step_id="remove",
+                description_placeholders={"info": "No manual entities configured."},
+                data_schema=vol.Schema({}),
+            )
+
+        if user_input is not None:
+            # user_input["topic"] contains the topic to remove
+            topic_to_remove = user_input.get("topic")
+            options = dict(self.config_entry.options) if self.config_entry.options else {}
+            manual_list = list(options.get("manual_entities", []))
+            manual_list = [m for m in manual_list if m.get("topic") != topic_to_remove]
+            options["manual_entities"] = manual_list
+            return self.async_create_entry(title="manual_entities", data=options)
+
+        schema = vol.Schema({vol.Required("topic"): vol.In(topics)})
+        return self.async_show_form(step_id="remove", data_schema=schema)
+
+    async def async_step_add(self, user_input: Dict[str, Any]) -> FlowResult:
+        """Add the manual entity to the config entry options."""
+        options = dict(self.config_entry.options) if self.config_entry.options else {}
+        manual = list(options.get("manual_entities", []))
+        topic = user_input.get("topic").strip()
+        name = user_input.get("name", "").strip() or None
+        manual.append({"topic": topic, "name": name})
+        options["manual_entities"] = manual
+
+        return self.async_create_entry(title="manual_entities", data=options)

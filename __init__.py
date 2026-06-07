@@ -7,6 +7,8 @@ from homeassistant.helpers.typing import ConfigType
 
 from .const import DOMAIN
 
+SERVICE_ADD_ENTITY = "add_entity"
+
 _LOGGER = logging.getLogger(__name__)
 
 PLATFORMS = ["switch"]
@@ -47,6 +49,40 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     # Listen for changes
     entry.async_on_unload(entry.add_update_listener(async_update_listener))
 
+    async def async_add_entity_service(call):
+        """Service handler to add a manual entity.
+
+        Payload: {"topic": "prefix/device", "name": "Friendly name", "entry_id": optional}
+        """
+        data = call.data or {}
+        topic = data.get("topic")
+        name = data.get("name")
+        target_entry_id = data.get("entry_id")
+
+        # Find the target entry
+        entries = hass.config_entries.async_entries(DOMAIN)
+        if target_entry_id:
+            entry_obj = next((e for e in entries if e.entry_id == target_entry_id), None)
+        else:
+            entry_obj = entries[0] if entries else None
+
+        if not entry_obj:
+            _LOGGER.error("No config entry found to add entity to")
+            return
+
+        # Persist in options
+        options = dict(entry_obj.options) if entry_obj.options else {}
+        manual = list(options.get("manual_entities", []))
+        manual.append({"topic": topic, "name": name})
+        options["manual_entities"] = manual
+        hass.config_entries.async_update_entry(entry_obj, options=options)
+
+        # Create entity immediately if manager exists
+        manager = hass.data[DOMAIN].get(entry_obj.entry_id, {}).get("manager")
+        if manager:
+            await manager.add_manual_entity(topic, name)
+
+    hass.services.async_register(DOMAIN, SERVICE_ADD_ENTITY, async_add_entity_service)
     return True
 
 
