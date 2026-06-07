@@ -75,11 +75,23 @@ class IOTLightningBridgeConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                 await self.async_set_unique_id(f"{DOMAIN}_{api_token}")
                 self._abort_if_unique_id_configured()
 
-                self._config_data = {
-                    CONF_API_TOKEN: api_token,
-                    CONF_BROKER_PREFIX: broker_prefix,
-                }
-                return await self.async_step_add_entity()
+                options: Dict[str, Any] = {}
+                topic = user_input.get("topic", "").strip()
+                if topic:
+                    manual = []
+                    name = user_input.get("name", "").strip() or None
+                    token = user_input.get("token", "").strip() or None
+                    manual.append({"topic": topic, "name": name, "token": token})
+                    options["manual_entities"] = manual
+
+                return self.async_create_entry(
+                    title="IOT Lightning Bridge",
+                    data={
+                        CONF_API_TOKEN: api_token,
+                        CONF_BROKER_PREFIX: broker_prefix,
+                    },
+                    options=options,
+                )
 
         # Create the form schema
         schema = vol.Schema(
@@ -92,6 +104,9 @@ class IOTLightningBridgeConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                     CONF_BROKER_PREFIX,
                     description={"suggested_value": DEFAULT_BROKER_PREFIX},
                 ): str,
+                vol.Optional("topic", default=""): str,
+                vol.Optional("name", default=""): str,
+                vol.Optional("token", default=""): str,
             }
         )
 
@@ -100,42 +115,7 @@ class IOTLightningBridgeConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             data_schema=schema,
             errors=errors,
             description_placeholders={
-                "info": "Enter your IOT Lightning Bridge credentials"
-            },
-        )
-
-    async def async_step_add_entity(
-        self, user_input: Optional[Dict[str, Any]] = None
-    ) -> FlowResult:
-        """Optionally add a manual entity during setup."""
-        if user_input is not None:
-            options: Dict[str, Any] = {}
-            topic = user_input.get("topic", "").strip()
-            if topic:
-                manual = []
-                name = user_input.get("name", "").strip() or None
-                token = user_input.get("token", "").strip() or None
-                manual.append({"topic": topic, "name": name, "token": token})
-                options["manual_entities"] = manual
-
-            return self.async_create_entry(
-                title="IOT Lightning Bridge",
-                data=self._config_data,
-                options=options,
-            )
-
-        schema = vol.Schema(
-            {
-                vol.Optional("topic", default=""): str,
-                vol.Optional("name", default=""): str,
-                vol.Optional("token", default=""): str,
-            }
-        )
-        return self.async_show_form(
-            step_id="add_entity",
-            data_schema=schema,
-            description_placeholders={
-                "info": "Optionally add one manual entity now with topic/name/token"
+                "info": "Enter your IOT Lightning Bridge credentials and optional entity details"
             },
         )
 

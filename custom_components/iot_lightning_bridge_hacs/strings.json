@@ -6,11 +6,17 @@
         "description": "Configure your IOT Lightning Bridge credentials. MQTT integration must be enabled in Home Assistant.",
         "data": {
           "api_token": "API Token",
-          "broker_prefix": "MQTT Broker Prefix"
+          "broker_prefix": "MQTT Broker Prefix",
+          "topic": "Entity MQTT Topic",
+          "name": "Friendly Name",
+          "token": "Entity Token"
         },
         "data_description": {
           "api_token": "Your authentication token (minimum 3 characters)",
-          "broker_prefix": "MQTT topic prefix (e.g., iot/lightning). Device will use this for state and command topics."
+          "broker_prefix": "MQTT topic prefix (e.g., iot/lightning). Device will use this for state and command topics.",
+          "topic": "Optional manual entity topic for this bridge",
+          "name": "Optional friendly name for the entity",
+          "token": "Optional token for this entity"
         }
       },
       "add_entity": {
