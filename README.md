@@ -47,7 +47,7 @@
 git clone https://github.com/tzongocu/iot_lightning_bridge_hacs.git
 
 # Copy into Home Assistant custom components
-cp -r iot_lightning_bridge_hacs /config/custom_components/
+cp -r custom_components/iot_lightning_bridge_hacs /config/custom_components/
 
 # Restart Home Assistant
 # Settings → System → Restart
