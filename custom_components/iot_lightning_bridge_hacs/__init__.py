@@ -52,11 +52,12 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     async def async_add_entity_service(call):
         """Service handler to add a manual entity.
 
-        Payload: {"topic": "prefix/device", "name": "Friendly name", "entry_id": optional}
+        Payload: {"topic": "prefix/device", "name": "Friendly name", "token": "optional", "entry_id": optional}
         """
         data = call.data or {}
         topic = data.get("topic")
         name = data.get("name")
+        token = data.get("token")
         target_entry_id = data.get("entry_id")
 
         # Find the target entry
@@ -73,14 +74,15 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         # Persist in options
         options = dict(entry_obj.options) if entry_obj.options else {}
         manual = list(options.get("manual_entities", []))
-        manual.append({"topic": topic, "name": name})
+        token = data.get("token")
+        manual.append({"topic": topic, "name": name, "token": token})
         options["manual_entities"] = manual
         hass.config_entries.async_update_entry(entry_obj, options=options)
 
         # Create entity immediately if manager exists
         manager = hass.data[DOMAIN].get(entry_obj.entry_id, {}).get("manager")
         if manager:
-            await manager.add_manual_entity(topic, name)
+            await manager.add_manual_entity(topic, name, token)
 
     hass.services.async_register(DOMAIN, SERVICE_ADD_ENTITY, async_add_entity_service)
     return True

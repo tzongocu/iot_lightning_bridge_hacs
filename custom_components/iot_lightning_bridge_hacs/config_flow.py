@@ -135,11 +135,17 @@ class IOTLightningBridgeOptionsFlow(config_entries.OptionsFlow):
         return self.async_show_form(step_id="init", data_schema=schema)
 
     async def async_step_add_form(self, user_input: Optional[Dict[str, Any]] = None) -> FlowResult:
-        """Show form to input topic and optional name for adding an entity."""
+        """Show form to input topic, token and optional name for adding an entity."""
         if user_input is not None:
             return await self.async_step_add(user_input)
 
-        schema = vol.Schema({vol.Required("topic"): str, vol.Optional("name", default=""): str})
+        schema = vol.Schema(
+            {
+                vol.Required("topic"): str,
+                vol.Optional("name", default=""): str,
+                vol.Optional("token", default=""): str,
+            }
+        )
         return self.async_show_form(step_id="add_form", data_schema=schema)
 
     async def async_step_remove(self, user_input: Optional[Dict[str, Any]] = None) -> FlowResult:
@@ -172,7 +178,8 @@ class IOTLightningBridgeOptionsFlow(config_entries.OptionsFlow):
         manual = list(options.get("manual_entities", []))
         topic = user_input.get("topic").strip()
         name = user_input.get("name", "").strip() or None
-        manual.append({"topic": topic, "name": name})
+        token = user_input.get("token", "").strip() or None
+        manual.append({"topic": topic, "name": name, "token": token})
         options["manual_entities"] = manual
 
         return self.async_create_entry(title="manual_entities", data=options)

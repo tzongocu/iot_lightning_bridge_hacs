@@ -71,12 +71,14 @@ class IOTLightningBridgeManager:
                 parts = topic.split("/") if isinstance(topic, str) else []
                 device_id = parts[-1] if parts else None
                 if device_id and device_id not in self._devices:
+                    token = item.get("token") if isinstance(item, dict) else None
                     ent = IOTDeviceSwitch(
                         hass=self.hass,
                         config_entry=self.config_entry,
                         api_token=self._api_token,
                         broker_prefix=self._broker_prefix,
                         device_id=device_id,
+                        token=token,
                     )
                     if name:
                         ent._attr_name = name
@@ -161,7 +163,7 @@ class IOTLightningBridgeManager:
         except Exception as err:
             _LOGGER.warning("MQTT not available or publish failed, skipping discovery: %s", err)
 
-    async def add_manual_entity(self, topic: str, name: str | None = None) -> None:
+    async def add_manual_entity(self, topic: str, name: str | None = None, token: str | None = None) -> None:
         """Create and add a manual entity at runtime.
 
         `topic` is the full topic (e.g. prefix/device). The device id is taken as last segment.
@@ -183,6 +185,7 @@ class IOTLightningBridgeManager:
                 api_token=self._api_token,
                 broker_prefix=self._broker_prefix,
                 device_id=device_id,
+                token=token,
             )
             if name:
                 ent._attr_name = name
@@ -210,6 +213,7 @@ class IOTDeviceSwitch(SwitchEntity):
         api_token: str,
         broker_prefix: str,
         device_id: str,
+        token: str | None = None,
     ) -> None:
         self.hass = hass
         self.config_entry = config_entry
@@ -229,6 +233,8 @@ class IOTDeviceSwitch(SwitchEntity):
             "manufacturer": "IOT Lightning",
             "model": "Device",
         }
+        # store optional token for this entity
+        self._entity_token = token
         # Track last trigger info for UI and automations
         self._last_triggered: str | None = None
         self._last_payload: str | None = None
@@ -281,6 +287,10 @@ class IOTDeviceSwitch(SwitchEntity):
         if self._last_payload:
             attrs["last_payload"] = self._last_payload
         attrs["trigger_count"] = self._trigger_count
+        if getattr(self, "_entity_token", None):
+            # show only masked token for safety
+            token = self._entity_token
+            attrs["entity_token"] = f"{token[:2]}***{token[-2:]}" if token and len(token) > 4 else "***"
         return attrs
 
     async def async_added_to_hass(self) -> None:
