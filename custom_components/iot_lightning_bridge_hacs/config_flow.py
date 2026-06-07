@@ -120,7 +120,7 @@ class IOTLightningBridgeOptionsFlow(config_entries.OptionsFlow):
     """Options flow to add manual entities (topics + friendly names)."""
 
     def __init__(self, config_entry: config_entries.ConfigEntry) -> None:
-        self.config_entry = config_entry
+        self._config_entry = config_entry
 
     async def async_step_init(self, user_input: Optional[Dict[str, Any]] = None) -> FlowResult:
         """Show initial options form: choose Add or Remove."""
@@ -144,7 +144,7 @@ class IOTLightningBridgeOptionsFlow(config_entries.OptionsFlow):
 
     async def async_step_remove(self, user_input: Optional[Dict[str, Any]] = None) -> FlowResult:
         """Show list of manual entities to remove."""
-        manual = list(self.config_entry.options.get("manual_entities", [])) if self.config_entry.options else []
+        manual = list(self._config_entry.options.get("manual_entities", [])) if self._config_entry.options else []
         topics = [m.get("topic") for m in manual if m.get("topic")]
 
         if not topics:
@@ -157,7 +157,7 @@ class IOTLightningBridgeOptionsFlow(config_entries.OptionsFlow):
         if user_input is not None:
             # user_input["topic"] contains the topic to remove
             topic_to_remove = user_input.get("topic")
-            options = dict(self.config_entry.options) if self.config_entry.options else {}
+            options = dict(self._config_entry.options) if self._config_entry.options else {}
             manual_list = list(options.get("manual_entities", []))
             manual_list = [m for m in manual_list if m.get("topic") != topic_to_remove]
             options["manual_entities"] = manual_list
@@ -168,7 +168,7 @@ class IOTLightningBridgeOptionsFlow(config_entries.OptionsFlow):
 
     async def async_step_add(self, user_input: Dict[str, Any]) -> FlowResult:
         """Add the manual entity to the config entry options."""
-        options = dict(self.config_entry.options) if self.config_entry.options else {}
+        options = dict(self._config_entry.options) if self._config_entry.options else {}
         manual = list(options.get("manual_entities", []))
         topic = user_input.get("topic").strip()
         name = user_input.get("name", "").strip() or None

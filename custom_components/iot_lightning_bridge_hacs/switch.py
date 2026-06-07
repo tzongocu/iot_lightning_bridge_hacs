@@ -10,6 +10,7 @@ from homeassistant.components.switch import SwitchEntity, SwitchDeviceClass
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
+from homeassistant.components import mqtt as mqtt_component
 
 from .const import CONF_API_TOKEN, CONF_BROKER_PREFIX, DOMAIN
 
@@ -86,7 +87,6 @@ class IOTLightningBridgeManager:
 
         # Subscribe to all topics under the broker prefix
         topic = f"{self._broker_prefix}/#"
-        mqtt = hass.components.mqtt
         # Use async_subscribe to receive messages
         async def _msg_received(msg):
             try:
@@ -133,9 +133,7 @@ class IOTLightningBridgeManager:
 
         # register subscription
         try:
-            coro = mqtt.async_subscribe(topic, _msg_received, qos=1)
-            # Schedule subscription
-            hass.async_create_task(coro)
+            hass.async_create_task(mqtt_component.async_subscribe(self.hass, topic, _msg_received, qos=1))
             _LOGGER.info("Subscribed to MQTT topic %s for dynamic device discovery", topic)
         except Exception:
             _LOGGER.exception("Failed to subscribe to MQTT topic for dynamic devices")
@@ -154,20 +152,14 @@ class IOTLightningBridgeManager:
         """
         # small delay to ensure subscription is registered
         await asyncio.sleep(0.5)
-        try:
-            mqtt = self.hass.components.mqtt
-        except Exception:
-            _LOGGER.warning("MQTT component not available; skipping active discovery")
-            return
-
         discovery_topic = f"{self._broker_prefix}/get"
         payload = json.dumps({"cmd": "whoareyou"})
 
         try:
-            await mqtt.async_publish(discovery_topic, payload=payload, qos=1, retain=False)
+            await mqtt_component.async_publish(self.hass, discovery_topic, payload=payload, qos=1, retain=False)
             _LOGGER.info("Published discovery request to %s", discovery_topic)
         except Exception as err:
-            _LOGGER.error("Failed to publish discovery request: %s", err)
+            _LOGGER.warning("MQTT not available or publish failed, skipping discovery: %s", err)
 
     async def add_manual_entity(self, topic: str, name: str | None = None) -> None:
         """Create and add a manual entity at runtime.
@@ -267,17 +259,11 @@ class IOTDeviceSwitch(SwitchEntity):
         self.async_write_ha_state()
 
     async def _publish_state(self) -> None:
-        try:
-            mqtt = self.hass.components.mqtt
-        except AttributeError:
-            _LOGGER.warning("MQTT component not available for state publishing")
-            return
-
         state_topic = f"{self._broker_prefix}/{self._device_id}/state"
         payload = f"{self._device_id}_on" if self._is_on else f"{self._device_id}_off"
 
         try:
-            await mqtt.async_publish(state_topic, payload=payload, qos=1, retain=True)
+            await mqtt_component.async_publish(self.hass, state_topic, payload=payload, qos=1, retain=True)
             _LOGGER.debug("Published state '%s' to topic '%s'", payload, state_topic)
         except Exception as err:
             _LOGGER.error("Error publishing state to MQTT topic %s: %s", state_topic, err)
@@ -305,11 +291,9 @@ class IOTDeviceSwitch(SwitchEntity):
 
     async def async_publish_discovery(self) -> None:
         """Publish MQTT Discovery configuration for this device."""
-        try:
-            mqtt = self.hass.components.mqtt
-        except AttributeError:
-            _LOGGER.warning("MQTT component not available for discovery")
-            return
+        device_id = self._device_id
+        object_id = device_id
+        discovery_topic = f"homeassistant/switch/{DOMAIN}/{object_id}/config"
 
         device_id = self._device_id
         object_id = device_id
@@ -335,22 +319,16 @@ class IOTDeviceSwitch(SwitchEntity):
         }
 
         try:
-            await mqtt.async_publish(discovery_topic, payload=json.dumps(discovery_payload), qos=1, retain=True)
+            await mqtt_component.async_publish(self.hass, discovery_topic, payload=json.dumps(discovery_payload), qos=1, retain=True)
             _LOGGER.info("Published MQTT Discovery to %s", discovery_topic)
         except Exception as err:
             _LOGGER.error("Error publishing MQTT Discovery for device %s: %s", device_id, err)
 
     async def _publish_availability(self, online: bool = True) -> None:
-        try:
-            mqtt = self.hass.components.mqtt
-        except AttributeError:
-            _LOGGER.warning("MQTT component not available for availability publishing")
-            return
-
         availability_topic = f"{self._broker_prefix}/availability"
         payload = "online" if online else "offline"
 
         try:
-            await mqtt.async_publish(availability_topic, payload=payload, qos=1, retain=True)
+            await mqtt_component.async_publish(self.hass, availability_topic, payload=payload, qos=1, retain=True)
         except Exception as err:
             _LOGGER.error("Error publishing availability to MQTT topic %s: %s", availability_topic, err)
