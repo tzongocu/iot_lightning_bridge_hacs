@@ -2,20 +2,13 @@
   <img src="./img/bg.jpg" alt="IOT Lightning Bridge Banner" width="100%" />
 </p>
 
-<p align="center" style="font-size: 2rem; margin: 0;">
-  <img src="./img/logo.jpg" alt="IOT Lightning Bridge Logo" width="32" style="vertical-align: middle; margin-right: 8px;" />
-  <strong>IOT Lightning Bridge HACS</strong>
-</p>
+<h1 style="text-align:left; font-size: 3rem; margin: 0 0 0.75rem 0;">IOT Lightning Bridge HACS</h1>
 
 [![hacs_badge](https://img.shields.io/badge/HACS-Custom-41BDF5.svg?style=for-the-badge)](https://github.com/hacs/integration)
 [![GitHub Release](https://img.shields.io/github/release/tzongocu/iot_lightning_bridge_hacs?style=for-the-badge)](https://github.com/tzongocu/iot_lightning_bridge_hacs/releases)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=for-the-badge)](https://opensource.org/licenses/MIT)
 
 **Official bridge for integrating IOT Lightning devices into Home Assistant via MQTT.**
-
-## 📬 Contact
-- Email: [contact@botrift.com](mailto:contact@botrift.com)
-- Creator: [https://botrift.com](https://botrift.com)
 
 ## 🎯 Features
 
@@ -268,7 +261,11 @@ pytest tests/
 - **Discussions:** [GitHub Discussions](https://github.com/tzongocu/iot_lightning_bridge_hacs/discussions)
 - **Home Assistant Forum:** Mention `@tzongocu`
 
-## 📄 License
+## � Contact
+- Email: [contact@botrift.com](mailto:contact@botrift.com)
+- Creator: [https://botrift.com](https://botrift.com)
+
+## �📄 License
 
 [MIT License](LICENSE) - Free to use in commercial and personal projects
 
