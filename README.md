@@ -2,7 +2,10 @@
   <img src="./img/bg.jpg" alt="IOT Lightning Bridge Banner" width="100%" />
 </p>
 
-# <img src="./img/logo.jpg" alt="IOT Lightning Bridge Logo" width="32" style="vertical-align: middle; margin-right: 8px;" /> IOT Lightning Bridge HACS
+<p align="center" style="font-size: 2rem; margin: 0;">
+  <img src="./img/logo.jpg" alt="IOT Lightning Bridge Logo" width="32" style="vertical-align: middle; margin-right: 8px;" />
+  <strong>IOT Lightning Bridge HACS</strong>
+</p>
 
 [![hacs_badge](https://img.shields.io/badge/HACS-Custom-41BDF5.svg?style=for-the-badge)](https://github.com/hacs/integration)
 [![GitHub Release](https://img.shields.io/github/release/tzongocu/iot_lightning_bridge_hacs?style=for-the-badge)](https://github.com/tzongocu/iot_lightning_bridge_hacs/releases)
@@ -30,7 +33,7 @@
 
 1. Open **HACS** → **Integrations**
 2. Click **⋮** (top-right) → **Custom repositories**
-3. Add the URL: `https://github.com/yourusername/iot_lightning_bridge_hacs`
+3. Add the URL: `https://github.com/tzongocu/iot_lightning_bridge_hacs`
 4. Select category: **Integration**
 5. Click **Install**
 6. **Restart Home Assistant**
@@ -232,7 +235,7 @@ iot_lightning_bridge_hacs/
 
 ```bash
 # Clone repo
-git clone https://github.com/yourusername/iot_lightning_bridge_hacs.git
+git clone https://github.com/tzongocu/iot_lightning_bridge_hacs.git
 cd iot_lightning_bridge_hacs
 
 # Check Python syntax
